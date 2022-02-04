@@ -1,0 +1,38 @@
+
+name: Astronomy-picture-hxt
+dependencies:
+- base
+- text
+- bytestring
+- mtl
+- hxt
+- hxt-css
+- http-conduit
+- http-client
+- hspec
+
+library:
+  source-dirs: src
+
+executables:
+  Astronomy-picture-hxt-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:  
+    - Astronomy-picture-hxt
+
+tests:
+  Astronomy-picture-hxt-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Astronomy-picture-hxt
+
