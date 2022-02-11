@@ -8,8 +8,6 @@ import Control.Arrow ((&&&))
 
 import Data.Time.Clock
 import Data.Time.Calendar
-import Data.Time.Calendar.MonthDay
-import Data.Time.Calendar.OrdinalDate
 
 import Network.HTTP.Simple
 import Control.Exception.Safe
@@ -33,7 +31,7 @@ today :: IO (Integer, Int)
 today = f . utctDay <$> getCurrentTime
   where
     f :: Day -> (Integer, Int)
-    f = (fst &&& (fst . dayOfYearToMonthAndDay True . snd)) . toOrdinalDate 
+    f d = let (y, m, _) = toGregorian d in (y, m)
 
 errorHandlerSimple = 
   [
@@ -51,3 +49,6 @@ donwloadAstronomyPicFromYMIO temp ym = do
       Just url -> do
         storeFromUrl temp url `catches` errorHandlerSimple
       Nothing -> pure ()
+
+donwloadAstronomyPicIO :: String -> IO ()
+donwloadAstronomyPicIO temp = undefined
