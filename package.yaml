@@ -4,6 +4,8 @@ dependencies:
 - base
 - text
 - bytestring
+- directory
+- strings
 - mtl
 - hxt
 - hxt-css
