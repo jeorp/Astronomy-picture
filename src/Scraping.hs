@@ -14,3 +14,17 @@ baseYearMonth s
 
 sampleUrl = "https://apod.nasa.gov/apod/ap160103.html"
 
+parseHTML = readString 
+  [ withValidate no,
+    withParseHTML yes,
+    withWarnings no
+  ]
+
+scraping body parser = runX (parseHTML body >>> parser)
+
+
+atTagCase tag = deep (isElem >>> hasNameWith ((== tag') . upper . localPart))
+  where tag' = upper tag
+        upper = map toUpper
+
+
