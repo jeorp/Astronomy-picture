@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}  
-module DonwloadHtml where
+module DownloadHtml where
 
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
@@ -21,3 +21,4 @@ downloadHtml url = do
         $ setRequestHeader "User-Agent" [userAgent]
         $ request'
   getResponseBody <$> httpBS request
+

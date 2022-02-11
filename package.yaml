@@ -2,6 +2,7 @@
 name: Astronomy-picture-hxt
 dependencies:
 - base
+- time
 - text
 - bytestring
 - directory
@@ -11,6 +12,8 @@ dependencies:
 - hxt-css
 - http-conduit
 - http-client
+- safe-exceptions
+- monad-logger
 - hspec
 
 library:
