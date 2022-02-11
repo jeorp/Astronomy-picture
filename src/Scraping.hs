@@ -2,12 +2,15 @@
 
 module Scraping where
 import Data.Char
+import Data.Maybe (listToMaybe)
 import Text.XML.HXT.Core
 import Text.XML.HXT.CSS
 import Control.Arrow
 import DownloadHtml
 import qualified Data.ByteString.Char8 as B
 
+import GHC.Exception (ErrorCall(..))
+import Control.Exception.Safe
 base = "https://apod.nasa.gov/apod"
 
 calYearMonth  :: Int -> String
@@ -46,8 +49,8 @@ extractPicUrl =
 
 scrapingUrls ym = do
   s <- B.unpack <$> downloadHtml (calYearMonth ym)
-  concat . tail <$> scraping s extractUrls
+  fmap ((base++) . dropWhile (== '.')) . concat . tail <$> scraping s extractUrls
 
 scrapingPicUrl url = do
   s <- B.unpack  <$> downloadHtml url
-  concat . tail <$> scraping s extractPicUrl
+  fmap (\s -> base++"/"++s) . listToMaybe . concat . tail <$> scraping s extractPicUrl

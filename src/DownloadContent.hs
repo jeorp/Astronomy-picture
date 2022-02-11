@@ -9,6 +9,10 @@ import Control.Monad
 import System.IO
 import System.Directory
 import Data.Strings
+import Control.Exception.Safe
+
+newtype NonContentException = NonContent String deriving (Show)
+instance Exception NonContentException
 
 -- input url and path 
 downloadContent :: String -> String -> IO ()
@@ -31,7 +35,7 @@ downloadContent url path = do
           hPutStr fin (BS.unpack bs)
           hClose fin
           putStrLn $ "status : Success download to " ++ path
-        else putStrLn "not content file"
+        else throw $ NonContent url
 
 
 urlToFileName :: String -> String
