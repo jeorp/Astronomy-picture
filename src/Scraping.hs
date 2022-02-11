@@ -9,14 +9,11 @@ import Control.Arrow
 import DownloadHtml
 import qualified Data.ByteString.Char8 as B
 
-import GHC.Exception (ErrorCall(..))
 import Control.Exception.Safe
 base = "https://apod.nasa.gov/apod"
 
-calYearMonth  :: Int -> String
-calYearMonth s 
- | length (show s) == 4 = "https://apod.nasa.gov/apod/calendar/ca" <> show s <> ".html"
- | otherwise = "error"
+calYearMonth  :: String -> String
+calYearMonth s = "https://apod.nasa.gov/apod/calendar/ca" <> show s <> ".html"
 
 
 parseHTML = readString 
@@ -54,3 +51,4 @@ scrapingUrls ym = do
 scrapingPicUrl url = do
   s <- B.unpack  <$> downloadHtml url
   fmap (\s -> base++"/"++s) . listToMaybe . concat . tail <$> scraping s extractPicUrl
+
