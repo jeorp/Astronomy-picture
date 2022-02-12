@@ -10,14 +10,15 @@ import Control.Concurrent.Async
 import Data.Time.Clock
 import Data.Time.Calendar
 
-
+import Data.Maybe (catMaybes)
 import Data.DList
 
 import Network.HTTP.Simple
 import Control.Exception.Safe
 
+
 firstYM :: (Integer, Int)
-firstYM = (1995, 6) 
+firstYM = (1995, 6) -- First post is from 1995 July. 
 
 stepMonth :: (Integer, Int) -> (Integer, Int)
 stepMonth (year, month)
@@ -37,6 +38,7 @@ today = f . utctDay <$> getCurrentTime
     f :: Day -> (Integer, Int)
     f d = let (y, m, _) = toGregorian d in (y, m)
 
+errorHandlerSimple :: [Handler IO ()]
 errorHandlerSimple = 
   [
     Handler (\(NonContent e) -> putStrLn $ "erorr : " <> e <> " is not picture url"),
@@ -44,27 +46,31 @@ errorHandlerSimple =
   ]
 
 
-getPicUrlFromYM :: String -> IO String
-getPicUrlFromYM ym = undefined
+getPicUrlAtYM :: (Integer, Int) -> IO [String]
+getPicUrlAtYM ym = scrapingUrls (toYM ym) >>= fmap catMaybes . traverse scrapingPicUrl
 
-getAllUrl :: IO [String]
-getAllUrl = undefined
-
-donwloadAstronomyPicFromYMIO :: String -> String -> IO ()
-donwloadAstronomyPicFromYMIO temp ym = do
-  urls <- scrapingUrls ym 
-  forM_ urls $ \url -> do 
-    picUrl <- scrapingPicUrl url 
-    case picUrl of
-      Just url -> do
-        storeFromUrl temp url `catches` errorHandlerSimple
-      Nothing -> pure ()
-
-donwloadAstronomyPicSimpleIO :: String -> IO ()
-donwloadAstronomyPicSimpleIO temp = do
-  infos <- flip apply [] <$> loop firstYM
-  mapConcurrently_ (storeFromUrl temp) infos
+getPicUrlFromYM :: (Integer, Int) -> (Integer, Int) -> IO [String]
+getPicUrlFromYM from to = flip apply [] <$> loop from empty
   where
-    loop :: (Integer, Int) -> IO (DList String)
-    loop ym = undefined
+    loop :: (Integer, Int) -> DList String -> IO (DList String)
+    loop ym dl 
+     | ym <= to = do  
+          xs <- getPicUrlAtYM ym
+          loop (stepMonth ym) (append (fromList xs) dl)
+     | otherwise =  pure dl
+
+getAllPicUrlSingle :: IO [String]
+getAllPicUrlSingle = today >>= getPicUrlFromYM firstYM
+
+getAllPicUrlEachYear :: IO [String]
+getAllPicUrlEachYear = undefined
+
+downloadPicWithHandlerSimple :: String -> String -> IO ()
+downloadPicWithHandlerSimple temp url = storeFromUrl temp url `catches` errorHandlerSimple
+
+donwloadAstronomyPicAtYM :: String -> (Integer, Int) -> IO ()
+donwloadAstronomyPicAtYM temp ym = getPicUrlAtYM ym >>= mapConcurrently_ (downloadPicWithHandlerSimple temp)
+
+donwloadAstronomyAllPicSimple :: String -> IO ()
+donwloadAstronomyAllPicSimple temp = getAllPicUrlSingle >>= mapConcurrently_ (downloadPicWithHandlerSimple temp)
       
