@@ -18,7 +18,7 @@ import Control.Exception.Safe
 
 
 firstYM :: (Integer, Int)
-firstYM = (1995, 6) -- First post is from 1995 July. 
+firstYM = (1995, 6) -- First post is from 1995 June. 
 
 stepMonth :: (Integer, Int) -> (Integer, Int)
 stepMonth (year, month)
@@ -62,8 +62,17 @@ getPicUrlFromYM from to = flip apply [] <$> loop from empty
 getAllPicUrlSingle :: IO [String]
 getAllPicUrlSingle = today >>= getPicUrlFromYM firstYM
 
-getAllPicUrlEachYear :: IO [String]
-getAllPicUrlEachYear = undefined
+getPicUrlFromY :: Integer -> IO [String]
+getPicUrlFromY year = getPicUrlFromYM (year, 1) (year, 12)
+
+getAllPicUrlEachYear :: IO [[String]]
+getAllPicUrlEachYear = do
+  now <- today
+  let
+    firstYear = fst firstYM
+    latteryear = fst now 
+    years = [firstYear .. latteryear]
+  mapConcurrently getPicUrlFromY years
 
 downloadPicWithHandlerSimple :: String -> String -> IO ()
 downloadPicWithHandlerSimple temp url = storeFromUrl temp url `catches` errorHandlerSimple
@@ -71,6 +80,10 @@ downloadPicWithHandlerSimple temp url = storeFromUrl temp url `catches` errorHan
 donwloadAstronomyPicAtYM :: String -> (Integer, Int) -> IO ()
 donwloadAstronomyPicAtYM temp ym = getPicUrlAtYM ym >>= mapConcurrently_ (downloadPicWithHandlerSimple temp)
 
-donwloadAstronomyAllPicSimple :: String -> IO ()
-donwloadAstronomyAllPicSimple temp = getAllPicUrlSingle >>= mapConcurrently_ (downloadPicWithHandlerSimple temp)
       
+donwloadAstronomyAllPic :: String -> IO ()
+donwloadAstronomyAllPic temp = getAllPicUrlEachYear >>= mapConcurrently_ donwloadEachYear
+  where
+    donwloadEachYear :: [String] -> IO ()
+    donwloadEachYear = mapM_ (downloadPicWithHandlerSimple temp)
+

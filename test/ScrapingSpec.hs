@@ -14,9 +14,9 @@ spec = do
     
     describe "scraping urls" $ do
       it "first url is ..." $ do
-        head <$> scrapingUrls 1601 `shouldReturn` "https://apod.nasa.gov/apod/ap160101.html"
+        head <$> scrapingUrls "1601" `shouldReturn` "https://apod.nasa.gov/apod/ap160101.html"
 
     describe "scraping pic url" $ do
       it "160103 pic url is ..." $ do
         let sampleUrl = "https://apod.nasa.gov/apod/ap160103.html"
-        scrapingPicUrl sampleUrl `shouldReturn` Just "image/1601/aurora_vetter_2000.jpg"
+        scrapingPicUrl sampleUrl `shouldReturn` Just "https://apod.nasa.gov/apod/image/1601/aurora_vetter_2000.jpg"
