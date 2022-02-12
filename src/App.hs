@@ -12,10 +12,10 @@ import Data.Time.Calendar
 import Network.HTTP.Simple
 import Control.Exception.Safe
 
-fistYaer = 1995 
-fisrtMonth = 6
+firstYM :: (Integer, Int)
+firstYM = (1995, 7) -- (1995, 6)
 
-stepMonth :: (Int, Int) -> (Int, Int)
+stepMonth :: (Integer, Int) -> (Integer, Int)
 stepMonth (year, month)
  | month `div` 12 == 0 = (year + 1, 1)
  | otherwise = (year, month + 1)
@@ -51,4 +51,14 @@ donwloadAstronomyPicFromYMIO temp ym = do
       Nothing -> pure ()
 
 donwloadAstronomyPicIO :: String -> IO ()
-donwloadAstronomyPicIO temp = undefined
+donwloadAstronomyPicIO temp = loop firstYM
+  where
+    loop :: (Integer, Int) -> IO ()
+    loop ym = do
+      now <- today
+      if ym <= now
+        then 
+          donwloadAstronomyPicFromYMIO temp (toYM ym) >> loop (stepMonth ym)
+        else 
+          putStrLn "finish"
+      

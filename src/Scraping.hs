@@ -13,7 +13,7 @@ import Control.Exception.Safe
 base = "https://apod.nasa.gov/apod"
 
 calYearMonth  :: String -> String
-calYearMonth s = "https://apod.nasa.gov/apod/calendar/ca" <> show s <> ".html"
+calYearMonth s = "https://apod.nasa.gov/apod/calendar/ca" <> s <> ".html"
 
 
 parseHTML = readString 
@@ -45,10 +45,15 @@ extractPicUrl =
 
 
 scrapingUrls ym = do
-  s <- B.unpack <$> downloadHtml (calYearMonth ym)
+  let url = calYearMonth ym
+  putStrLn $  "access : " <> url
+  s <- B.unpack <$> downloadHtml url
   fmap ((base++) . dropWhile (== '.')) . concat . tail <$> scraping s extractUrls
 
 scrapingPicUrl url = do
   s <- B.unpack  <$> downloadHtml url
   fmap (\s -> base++"/"++s) . listToMaybe . concat . tail <$> scraping s extractPicUrl
 
+safeTail :: [a] -> Maybe a
+safeTail (a: as) = Just a
+safeTail [] = Nothing 
