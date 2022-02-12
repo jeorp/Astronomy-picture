@@ -2,6 +2,7 @@
 
 module Scraping where
 import Data.Char
+import Data.List (isPrefixOf)
 import Data.Maybe (listToMaybe)
 import Text.XML.HXT.Core
 import Text.XML.HXT.CSS
@@ -43,17 +44,20 @@ extractPicUrl =
   >>> proc r -> do
     listA onA -< r
 
-
 scrapingUrls ym = do
   let url = calYearMonth ym
   putStrLn $  "access : " <> url
   s <- B.unpack <$> downloadHtml url
-  fmap ((base++) . dropWhile (== '.')) . concat . tail <$> scraping s extractUrls
+  fmap ((base++) . dropWhile (== '.')) . concat . safeTail <$> scraping s extractUrls
 
 scrapingPicUrl url = do
   s <- B.unpack  <$> downloadHtml url
-  fmap (\s -> base++"/"++s) . listToMaybe . concat . tail <$> scraping s extractPicUrl
+  fmap f . listToMaybe . concat . safeTail <$> scraping s extractPicUrl
+  where
+    f :: String -> String
+    f s = if "http" `isPrefixOf` s then s else base++"/"++s
 
-safeTail :: [a] -> Maybe a
-safeTail (a: as) = Just a
-safeTail [] = Nothing 
+
+safeTail :: [a] -> [a]
+safeTail (a: as) = as
+safeTail [] = []

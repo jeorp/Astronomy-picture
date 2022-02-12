@@ -9,11 +9,13 @@ import Control.Arrow ((&&&))
 import Data.Time.Clock
 import Data.Time.Calendar
 
+import Model
+
 import Network.HTTP.Simple
 import Control.Exception.Safe
 
 firstYM :: (Integer, Int)
-firstYM = (1995, 7) -- (1995, 6)
+firstYM = (1995, 6) 
 
 stepMonth :: (Integer, Int) -> (Integer, Int)
 stepMonth (year, month)
@@ -35,10 +37,13 @@ today = f . utctDay <$> getCurrentTime
 
 errorHandlerSimple = 
   [
-    Handler (\(NonContent e) -> print e),
+    Handler (\(NonContent e) -> putStrLn $ "erorr : " <> e <> " is not picture url"),
     Handler (\(InvalidUrlException url e) -> print $ url <> " is " <> e)
   ]
 
+
+getInfoFromYM :: String -> IO Info
+getInfoFromYM ym = undefined
 
 donwloadAstronomyPicFromYMIO :: String -> String -> IO ()
 donwloadAstronomyPicFromYMIO temp ym = do
@@ -50,8 +55,8 @@ donwloadAstronomyPicFromYMIO temp ym = do
         storeFromUrl temp url `catches` errorHandlerSimple
       Nothing -> pure ()
 
-donwloadAstronomyPicIO :: String -> IO ()
-donwloadAstronomyPicIO temp = loop firstYM
+donwloadAstronomyPicSimpleIO :: String -> IO ()
+donwloadAstronomyPicSimpleIO temp = loop firstYM
   where
     loop :: (Integer, Int) -> IO ()
     loop ym = do
@@ -60,5 +65,5 @@ donwloadAstronomyPicIO temp = loop firstYM
         then 
           donwloadAstronomyPicFromYMIO temp (toYM ym) >> loop (stepMonth ym)
         else 
-          putStrLn "finish"
+          putStrLn "finish !"
       

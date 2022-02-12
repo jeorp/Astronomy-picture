@@ -1,7 +1,5 @@
 .stack-work/
 Astronomy-picture-hxt.cabal
 *.env
-*.gif
-*.jpeg
-*.jpg
-*.png
+*.db
+temp/

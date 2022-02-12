@@ -5,7 +5,6 @@ module DownloadContent where
 import Network.HTTP.Simple
 --import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BS
-import Control.Monad
 import System.IO
 import System.Directory
 import Data.Strings
@@ -18,13 +17,11 @@ instance Exception NonContentException
 downloadContent :: String -> String -> IO ()
 downloadContent url path = do
   putStrLn $ "status : Downloading to " ++ path
-  b <- doesFileExist path
-  unless b $ do
-    res <- httpBS $ parseRequest_ url
-    let xs = getResponseHeader "Content-Type" res
-        file = getResponseBody res
-        contentType = if not (null xs) then head xs else ""
-    store path file contentType
+  res <- httpBS $ parseRequest_ url
+  let xs = getResponseHeader "Content-Type" res
+      file = getResponseBody res
+      contentType = if not (null xs) then head xs else ""
+  store path file contentType
   where
     store :: FilePath -> BS.ByteString -> BS.ByteString -> IO ()
     store path bs c = do
