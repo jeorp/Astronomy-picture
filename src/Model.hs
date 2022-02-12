@@ -4,8 +4,8 @@ import           Database.SQLite.Simple.FromRow
 
 data Info = Info 
   {
-    url :: String,
-    description :: String
+    _url :: String,
+    _description :: String
     
   } deriving(Show, Eq)
 

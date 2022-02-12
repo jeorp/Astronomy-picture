@@ -19,7 +19,7 @@ firstYM = (1995, 6)
 
 stepMonth :: (Integer, Int) -> (Integer, Int)
 stepMonth (year, month)
- | month `div` 12 == 0 = (year + 1, 1)
+ | month `mod` 12 == 0 = (year + 1, 1)
  | otherwise = (year, month + 1)
 
 toYM :: (Integer, Int) -> String
@@ -44,6 +44,8 @@ errorHandlerSimple =
 
 getInfoFromYM :: String -> IO Info
 getInfoFromYM ym = undefined
+
+--getAllInfo
 
 donwloadAstronomyPicFromYMIO :: String -> String -> IO ()
 donwloadAstronomyPicFromYMIO temp ym = do

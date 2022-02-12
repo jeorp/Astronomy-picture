@@ -8,12 +8,14 @@ dependencies:
 - directory
 - strings
 - mtl
+- lens
 - hxt
 - hxt-css
 - http-conduit
 - http-client
 - safe-exceptions
 - sqlite-simple
+- resource-pool
 - hspec
 
 library:
