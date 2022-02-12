@@ -5,11 +5,15 @@ import Scraping
 import DownloadContent
 
 import Control.Arrow ((&&&))
+import Control.Lens
+import Control.Concurrent.Async
 
 import Data.Time.Clock
 import Data.Time.Calendar
 
 import Model
+
+import Data.DList
 
 import Network.HTTP.Simple
 import Control.Exception.Safe
@@ -45,7 +49,8 @@ errorHandlerSimple =
 getInfoFromYM :: String -> IO Info
 getInfoFromYM ym = undefined
 
---getAllInfo
+getAllInfo :: IO [Info]
+getAllInfo = undefined
 
 donwloadAstronomyPicFromYMIO :: String -> String -> IO ()
 donwloadAstronomyPicFromYMIO temp ym = do
@@ -58,14 +63,10 @@ donwloadAstronomyPicFromYMIO temp ym = do
       Nothing -> pure ()
 
 donwloadAstronomyPicSimpleIO :: String -> IO ()
-donwloadAstronomyPicSimpleIO temp = loop firstYM
+donwloadAstronomyPicSimpleIO temp = do
+  infos <- flip apply [] <$> loop firstYM
+  mapConcurrently_ (storeFromUrl temp . (^. url)) infos
   where
-    loop :: (Integer, Int) -> IO ()
-    loop ym = do
-      now <- today
-      if ym <= now
-        then 
-          donwloadAstronomyPicFromYMIO temp (toYM ym) >> loop (stepMonth ym)
-        else 
-          putStrLn "finish !"
+    loop :: (Integer, Int) -> IO (DList Info)
+    loop ym = undefined
       

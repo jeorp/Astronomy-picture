@@ -1,6 +1,9 @@
+ {-# LANGUAGE TemplateHaskell #-}
  module Model where
-import           Database.SQLite.Simple
-import           Database.SQLite.Simple.FromRow
+
+import Control.Lens
+import Database.SQLite.Simple
+import Database.SQLite.Simple.FromRow
 
 data Info = Info 
   {
@@ -8,6 +11,8 @@ data Info = Info
     _description :: String
     
   } deriving(Show, Eq)
+
+makeLenses ''Info
 
 instance FromRow Info where
   fromRow = Info <$> field <*> field

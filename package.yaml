@@ -7,6 +7,8 @@ dependencies:
 - bytestring
 - directory
 - strings
+- dlist
+- async
 - mtl
 - lens
 - hxt
