@@ -1,7 +1,7 @@
 module ScrapingSpec where
 
 import Test.Hspec
-import Scraping
+import ScrapingHxt
 import DownloadHtml
 
 main = hspec spec
