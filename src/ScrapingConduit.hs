@@ -17,12 +17,3 @@ downloadPicFromYMStream temp from to = runConduit
 
 downloadPicAtYStream :: String -> Integer -> IO ()
 downloadPicAtYStream temp year = downloadPicFromYMStream temp (year, 1) (year, 12)
-
-donwloadAstronomyAllPicStreamM :: String -> IO ()
-donwloadAstronomyAllPicStreamM temp = do
-  now <- today
-  let
-    firstYear = fst firstYM
-    latterYear = fst now 
-    years = [firstYear .. latterYear]
-  mapM_ (downloadPicAtYStream temp) years
