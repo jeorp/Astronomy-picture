@@ -17,10 +17,11 @@ instance Exception NonContentException
 downloadContent :: String -> String -> IO ()
 downloadContent url path = do
   putStrLn $ "status : Downloading to " ++ path
-  res <- httpBS $ parseRequest_ url
+  res <- httpBS (parseRequest_ url) `catch` (\(HttpExceptionRequest _ _) -> throw $ NonContent url)
   let xs = getResponseHeader "Content-Type" res
       file = getResponseBody res
       contentType = if not (null xs) then head xs else ""
+      status = getResponseStatus res
   store path file contentType
   where
     store :: FilePath -> BS.ByteString -> BS.ByteString -> IO ()
@@ -39,12 +40,6 @@ urlToFileName :: String -> String
 urlToFileName s = 
   let xs = strSplitAll "/" s
       ls = if null xs then "error" else last xs
-    in ls
-
-eliminate :: String -> String
-eliminate s = 
-  let xs = strSplitAll "." s
-      ls = if null xs then s else head xs
     in ls
 
 storeFromUrl :: String -> String -> IO ()

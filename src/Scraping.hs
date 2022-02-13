@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 module Scraping where
 
 import Control.Monad
@@ -15,6 +16,7 @@ import Data.DList
 
 import Network.HTTP.Simple
 import Control.Exception.Safe
+
 
 
 firstYM :: (Integer, Int)
@@ -38,11 +40,12 @@ today = f . utctDay <$> getCurrentTime
     f :: Day -> (Integer, Int)
     f d = let (y, m, _) = toGregorian d in (y, m)
 
+
 errorHandlerSimple :: [Handler IO ()]
 errorHandlerSimple = 
   [
     Handler (\(NonContent e) -> putStrLn $ "erorr : " <> e <> " is not picture url"),
-    Handler (\(InvalidUrlException url e) -> print $ url <> " is " <> e)
+    Handler (\(InvalidUrlException url e) -> putStrLn $ url <> " is " <> e)
   ]
 
 
@@ -62,8 +65,8 @@ getPicUrlFromYM from to = flip apply [] <$> loop from empty
 getAllPicUrlSingle :: IO [String]
 getAllPicUrlSingle = today >>= getPicUrlFromYM firstYM
 
-getPicUrlFromY :: Integer -> IO [String]
-getPicUrlFromY year = getPicUrlFromYM (year, 1) (year, 12)
+getPicUrlAtY :: Integer -> IO [String]
+getPicUrlAtY year = getPicUrlFromYM (year, 1) (year, 12)
 
 getAllPicUrlEachYear :: IO [[String]]
 getAllPicUrlEachYear = do
@@ -72,13 +75,13 @@ getAllPicUrlEachYear = do
     firstYear = fst firstYM
     latterYear = fst now 
     years = [firstYear .. latterYear]
-  mapConcurrently getPicUrlFromY years
+  mapConcurrently getPicUrlAtY years
 
 downloadPicWithHandlerSimple :: String -> String -> IO ()
 downloadPicWithHandlerSimple temp url = storeFromUrl temp url `catches` errorHandlerSimple
 
 donwloadAstronomyPicAtYM :: String -> (Integer, Int) -> IO ()
-donwloadAstronomyPicAtYM temp ym = getPicUrlAtYM ym >>= mapConcurrently_ (downloadPicWithHandlerSimple temp)
+donwloadAstronomyPicAtYM temp ym = getPicUrlAtYM ym >>= mapM_ (downloadPicWithHandlerSimple temp)
 
       
 donwloadAstronomyAllPic :: String -> IO ()

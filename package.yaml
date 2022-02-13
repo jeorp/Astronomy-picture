@@ -8,6 +8,7 @@ dependencies:
 - directory
 - strings
 - dlist
+- conduit
 - async
 - mtl
 - hxt
